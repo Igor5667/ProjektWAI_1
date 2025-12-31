@@ -1,3 +1,6 @@
+<?php 
+    require_once './helpers/functions.php';
+?>
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -15,20 +18,26 @@
 
     <div class="d-flex flex-wrap gap-4 mt-4 p-2 justify-content-center">
         <?php
-            $katalog = 'images/thumbnails';
-            $nazwy_plikow = array_diff(scandir($katalog), ['.','..']);
+            $dir = 'images/thumbnails';
+            $photos = downloadPhotos($dir);
+            
+            $page = isset($_GET['page']) ? $_GET['page'] : 1;
+            $perPage = 4;
+            
+            $photosToDisplay = array_slice($photos, 0, $perPage*$page);
 
-            foreach($nazwy_plikow as $nazwa_pliku):
-                if(preg_match('/\.(jpg|png)$/i', $nazwa_pliku)):
+            foreach($photosToDisplay as $photo_name):
         ?>
                     <div class="card">
-                        <img class="card-img-top" src="<?php echo $katalog . '/' . $nazwa_pliku; ?>" alt="<?php echo $nazwa_pliku; ?>">
-                        <div class="card-body"><?php echo $nazwa_pliku; ?></div>
+                        <img class="card-img-top" src="<?php echo $dir . '/' . $photo_name; ?>" alt="<?php echo $photo_name; ?>">
+                        <div class="card-body"><?php echo $photo_name; ?></div>
                     </div>
         <?php
-                endif;
             endforeach;
         ?>
     </div>
+    <?php
+        include "components/loadMoreButton.php";
+    ?>
 </body>
 </html>
