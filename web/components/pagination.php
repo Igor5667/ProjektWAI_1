@@ -5,7 +5,7 @@
     </a>
     <?php endif; ?>
     <div>Strona: <?= $page ?></div>
-    <?php if($page < $pagesAmount): ?>
+    <?php if($page < $viewData['pagesAmount']): ?>
     <a href="index.php?page=<?= $page + 1 ?>">
         <button class="btn btn-secondary">→</button>
     </a>

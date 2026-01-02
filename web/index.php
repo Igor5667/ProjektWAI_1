@@ -7,63 +7,35 @@
 
     switch ($action) {
         case 'upload':
+            $errors = [];
+            $passed = false;
             $view = 'upload_view.php';
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
-            // nie wyświetlaj gdy po prostu wchodzisz na stronę
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $errors = [];
-                $passed = false; // Domyślnie operacja nieudana
-
-                if (!isset($_FILES['photo']) || $_FILES['photo']['error'] === UPLOAD_ERR_NO_FILE) {
-                    $errors[] = "Nie wybrano zdjęcia";
-                } 
-                else {
-                    $file = $_FILES['photo'];
-                    $name = basename($file['name']);
-                    $target = 'images/' . $name;
-                    $thumbTarget = 'images/thumbnails/' . pathinfo($name, PATHINFO_FILENAME) . '.jpg';
-
-                    // sprawdzenie rozmiaru zdjecia < 1MB
-                    if ($file['size'] > 1024 * 1024
-                    || $file['error'] == UPLOAD_ERR_INI_SIZE //    gdy size >2MB to zwraca error
-                    || $file['error'] == UPLOAD_ERR_FORM_SIZE) {// by size i zeruje wagę pliku
-                        $errors[] = "Plik jest za duży (max 1MB).";
-                    }
-
-                    // sprawdzenie typu zdjecia
-                    if (!preg_match('/\.(jpg|png)$/i', $name)) {
-                        $errors[] = "Wybrano nieodpowiedni typ zdjęcia.";
-                    }
-
-                    // przenoszenie obecnego pliku i tworzenie miniaturk
-                    if(empty($errors)){
-                        if (move_uploaded_file($file['tmp_name'], $target)) {
-                            createThumbnail($target, $thumbTarget);
-                            $errors[] = "Udało się dodać zdjęcie <b>$name</b>";
-                            $passed = true;
-                        } else {
-                            $errors[] = "Nie udało się dodać zdjęcia (błąd serwera) spróbuj ponownie później";
-                        }
-                    }
+            if (!isset($_FILES['photo']) || $_FILES['photo']['error'] === UPLOAD_ERR_NO_FILE) {
+                $errors[] = "Nie wybrano zdjęcia";
+            } else {
+                $result = handleUpload($_FILES['photo']);
+                
+                if ($result['success']) {
+                    $passed = true;
+                    $errors[] = $result['msg'];
+                } else {
+                    $errors = array_merge($errors, $result['errors']);
                 }
-                showMessage($errors, $passed);
             }
+            showMessage($errors, $passed);
+            
             break;
         case 'library':
         default:
             $view = 'library_view.php';
-            
-            $dir = 'images/thumbnails';
-            $photos = downloadPhotos($dir);
-            
-            $perPage = 4;
-            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-            $pagesAmount = ceil(count($photos)/$perPage);
-            if($page < 0) $page = 0;
-            if($page > $pagesAmount) $page = $pagesAmount;
-            $offset = ($page - 1) * $perPage;
 
-            $viewData['photos'] = array_slice($photos, $offset, $perPage);
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+            $picturesData = displayPhotos($page);
+            $viewData['photos'] = $picturesData['photosToDisplay'];
+            $viewData['pagesAmount'] = $picturesData['pagesAmount'];
             
             break;
     }

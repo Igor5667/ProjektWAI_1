@@ -57,4 +57,50 @@ function showMessage($message, $passed){
             $icon &nbsp; $message
         </div>";
 }
-?>
+
+function handleUpload($file) {
+    $errors = [];
+    $name = basename($file['name']);
+    $target = 'images/' . $name;
+    $thumbTarget = 'images/thumbnails/' . pathinfo($name, PATHINFO_FILENAME) . '.jpg';
+
+    // sprawdzanie typu zdjecia
+    if (!preg_match('/\.(jpg|png)$/i', $name)) {
+        $errors[] = "Wybrano nieodpowiedni typ zdjęcia.";
+    }
+
+    // sprawdzanie rozmiaru zdjecia <1MB
+    if ($file['size'] > 1024 * 1024 
+    || $file['error'] == UPLOAD_ERR_INI_SIZE // ten blad jest wtedy gdy size>2MB
+    || $file['error'] == UPLOAD_ERR_FORM_SIZE) {
+        $errors[] = "Plik jest za duży (max 1MB).";
+    }
+
+    // przenoszenie obecnego pliku i tworzenie miniaturki
+    if (empty($errors)) {
+        if (move_uploaded_file($file['tmp_name'], $target)) {
+            createThumbnail($target, $thumbTarget);
+            return ['success' => true, 'msg' => "Udało się dodać zdjęcie $name"];
+        } else {
+            $errors[] = "Błąd serwera przy zapisie.";
+        }
+    }
+
+    return ['success' => false, 'errors' => $errors];
+}
+
+function displayPhotos($page){
+    $photos = downloadPhotos($dir);
+
+    $perPage = 4;
+    
+    $pagesAmount = ceil(count($photos)/$perPage);
+    if($page < 0) $page = 0;
+    if($page > $pagesAmount) $page = $pagesAmount;
+    $offset = ($page - 1) * $perPage;
+
+    return [
+        'photosToDisplay' => array_slice($photos, $offset, $perPage),
+        'pagesAmount' => $pagesAmount
+    ];
+}
