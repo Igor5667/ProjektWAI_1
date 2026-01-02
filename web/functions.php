@@ -1,19 +1,23 @@
 <?php
-function downloadPhotos($dir){
-    if(!is_dir($dir)){
-        return [];
-    }
 
-    $files = array_diff(scandir($dir), ['.','..']);
-    $photos = [];
-    
-    foreach($files as $file){
-        if(preg_match('/\.(jpg|png)$/i', $file)){
-            $photos[] = $file;
-        }
-    }
+function downloadGames(){
+    $manager = getDb();
+    $query = new MongoDB\Driver\Query([], []); // wybieram wszystkie dokumenty
+    $cursor = $manager->executeQuery('wai.games', $query);
+    $results = $cursor->toArray();
 
-    return array_values($photos);
+    return $results;
+}
+
+function getDb() {
+    try {
+        $password = urlencode("w@i_w3b");
+        $db_host = "mongodb://wai_web:$password@localhost:27017/wai";
+        $manager = new MongoDB\Driver\Manager($db_host);
+        return $manager;
+    } catch (Exception $e) {
+        die("Błąd połączenia z bazą: " . $e->getMessage());
+    }
 }
 
 function createThumbnail($sourcePath, $destPath, $width = 200, $height = 125) {
@@ -89,18 +93,18 @@ function handleUpload($file) {
     return ['success' => false, 'messages' => $messages];
 }
 
-function displayPhotos($page){
-    $photos = downloadPhotos($dir);
+function displayGames($page){
+    $games = downloadGames();
 
     $perPage = 4;
     
-    $pagesAmount = ceil(count($photos)/$perPage);
+    $pagesAmount = ceil(count($games)/$perPage);
     if($page < 0) $page = 0;
     if($page > $pagesAmount) $page = $pagesAmount;
     $offset = ($page - 1) * $perPage;
 
     return [
-        'photosToDisplay' => array_slice($photos, $offset, $perPage),
+        'gamesToDisplay' => array_slice($games, $offset, $perPage),
         'pagesAmount' => $pagesAmount
     ];
 }
