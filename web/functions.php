@@ -1,6 +1,6 @@
 <?php
 
-function downloadGames(){
+function fetchGames(){
     $manager = getDb();
     $query = new MongoDB\Driver\Query([], []); // wybieram wszystkie dokumenty
     $cursor = $manager->executeQuery('wai.games', $query);
@@ -18,6 +18,21 @@ function getDb() {
     } catch (Exception $e) {
         die("Błąd połączenia z bazą: " . $e->getMessage());
     }
+}
+
+function insertGameToDB($file_name, $author, $title){
+    $manager = getDb();
+    $bulk = new MongoDB\Driver\BulkWrite;
+    
+    $doc = [
+        'file_name' => $file_name,
+        'author' => $author,
+        'title' => $title
+    ];
+    
+    $bulk->insert($doc);
+    
+    $manager->executeBulkWrite('wai.games', $bulk);
 }
 
 function createThumbnail($sourcePath, $destPath, $width = 200, $height = 125) {
@@ -62,29 +77,36 @@ function showMessage($message, $passed){
         </div>";
 }
 
-function handleUpload($file) {
+function handleUpload($photo, $uploadData) {
     $messages = [];
-    $name = basename($file['name']);
-    $target = 'images/' . $name;
-    $thumbTarget = 'images/thumbnails/' . pathinfo($name, PATHINFO_FILENAME) . '.jpg';
+    $photoName = basename($photo['name']);
+    $target = 'images/' . $photoName;
+    $thumbTarget = 'images/thumbnails/' . pathinfo($photoName, PATHINFO_FILENAME) . '.jpg';
 
     // sprawdzanie typu zdjecia
-    if (!preg_match('/\.(jpg|png)$/i', $name)) {
+    if (!preg_match('/\.(jpg|png)$/i', $photoName)) {
         $messages[] = "Wybrano nieodpowiedni typ zdjęcia.";
     }
 
     // sprawdzanie rozmiaru zdjecia <1MB
-    if ($file['size'] > 1024 * 1024 
-    || $file['error'] == UPLOAD_ERR_INI_SIZE // ten blad jest wtedy gdy size>2MB
-    || $file['error'] == UPLOAD_ERR_FORM_SIZE) {
+    if ($photo['size'] > 1024 * 1024 
+    || $photo['error'] == UPLOAD_ERR_INI_SIZE // ten blad jest wtedy gdy size>2MB
+    || $photo['error'] == UPLOAD_ERR_FORM_SIZE) {
         $messages[] = "Plik jest za duży (max 1MB).";
+    }
+
+    // sprawdzanie czy autor albo tytul zostali dodani
+    if($uploadData['author'] == '' || $uploadData['title'] == ''){
+        $messages[] = "Nie podano autora bądz tytułu";
     }
 
     // przenoszenie obecnego pliku i tworzenie miniaturki
     if (empty($messages)) {
-        if (move_uploaded_file($file['tmp_name'], $target)) {
+        insertGameToDB($photoName, $uploadData['author'], $uploadData['title']);
+        if (move_uploaded_file($photo['tmp_name'], $target)) {
             createThumbnail($target, $thumbTarget);
-            return ['success' => true, 'msg' => "Udało się dodać zdjęcie $name"];
+            $title = $uploadData['title'];
+            return ['success' => true, 'msg' => "Udało się dodać grę <b>$title</b>"];
         } else {
             $messages[] = "Błąd serwera przy zapisie.";
         }
@@ -94,7 +116,7 @@ function handleUpload($file) {
 }
 
 function displayGames($page){
-    $games = downloadGames();
+    $games = fetchGames();
 
     $perPage = 4;
     

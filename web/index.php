@@ -15,7 +15,7 @@ switch ($action) {
         if (!isset($_FILES['photo']) || $_FILES['photo']['error'] === UPLOAD_ERR_NO_FILE) {
             $messages[] = "Nie wybrano zdjęcia";
         } else {
-            $result = handleUpload($_FILES['photo']);
+            $result = handleUpload($_FILES['photo'], $_POST);
             
             if ($result['success']) {
                 $passed = true;
@@ -24,6 +24,8 @@ switch ($action) {
                 $messages = array_merge($messages, $result['messages']);
             }
         }
+        showMessage($messages, $passed);
+
         $viewData['messages'] = $messages;
         $viewData['passed'] = $passed;
         

@@ -6,13 +6,15 @@
 <p class="text-center">wypełnij poniższy formularz i prześlij</p>
 
 <form method="post" enctype="multipart/form-data" class="container d-flex flex-column gap-3 mt-5" style="background-color: white">
-    <div>
-        <input type="file" name="photo" id="fileInput" class="form-control">
-        <label for="fileInput" class="text-center" style="color: #000000c1; font-size: 12px">Powinno być w formacie JPG lub PNG oraz nie przekraczać 1MB</label>
+    <div class="d-flex flex-column gap-3">
+        <input type="text" name="author" id="author" placeholder="Autor" class="form-control">
+        <input type="text" name="title" id="title" placeholder="Tytuł" class="form-control">
+        <div class="d-flex flex-column">
+            <input type="file" name="photo" id="fileInput" class="form-control">
+            <label for="fileInput" class="text-start" style="color: #000000c1; font-size: 12px">
+                Powinno być w formacie JPG lub PNG oraz nie przekraczać 1MB
+            </label>
+        </div>
     </div>
     <button type="submit" class="btn btn-primary">Wyślij</button>
 </form>
-
-<?php
-    showMessage($viewData['messages'], $viewData['passed']);
-?>
