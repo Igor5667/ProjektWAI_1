@@ -7,24 +7,25 @@
 
     switch ($action) {
         case 'upload':
-            $errors = [];
+            $messages = [];
             $passed = false;
             $view = 'upload_view.php';
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
             if (!isset($_FILES['photo']) || $_FILES['photo']['error'] === UPLOAD_ERR_NO_FILE) {
-                $errors[] = "Nie wybrano zdjęcia";
+                $messages[] = "Nie wybrano zdjęcia";
             } else {
                 $result = handleUpload($_FILES['photo']);
                 
                 if ($result['success']) {
                     $passed = true;
-                    $errors[] = $result['msg'];
+                    $messages[] = $result['msg'];
                 } else {
-                    $errors = array_merge($errors, $result['errors']);
+                    $messages = array_merge($messages, $result['messages']);
                 }
             }
-            showMessage($errors, $passed);
+            $viewData['messages'] = $messages;
+            $viewData['passed'] = $passed;
             
             break;
         case 'library':
