@@ -6,11 +6,18 @@ function fetchGames(){
     $cursor = $manager->executeQuery('wai.games', $query);
     $results = $cursor->toArray();
 
+    // thumbnaile są tylko jpg
+    foreach($results as $result){
+        $result->thnumbnail_name = pathinfo($result->file_name, PATHINFO_FILENAME) . '.jpg';
+    }
+
     return $results;
 }
 
 function getDb() {
     try {
+        // używam niskopoziomowego Manager ponieważ 
+        // na VirtualMachine nie ma Composera żeby użyć Client
         $password = urlencode("w@i_w3b");
         $db_host = "mongodb://wai_web:$password@localhost:27017/wai";
         $manager = new MongoDB\Driver\Manager($db_host);
@@ -20,19 +27,13 @@ function getDb() {
     }
 }
 
-function insertGameToDB($file_name, $author, $title){
+function insertToDb($collection, $document){
     $manager = getDb();
     $bulk = new MongoDB\Driver\BulkWrite;
     
-    $doc = [
-        'file_name' => $file_name,
-        'author' => $author,
-        'title' => $title
-    ];
+    $bulk->insert($document);
     
-    $bulk->insert($doc);
-    
-    $manager->executeBulkWrite('wai.games', $bulk);
+    $manager->executeBulkWrite("wai.$collection", $bulk);
 }
 
 function createThumbnail($sourcePath, $destPath, $width = 200, $height = 125) {
@@ -100,9 +101,17 @@ function handleUpload($photo, $uploadData) {
         $messages[] = "Nie podano autora bądz tytułu";
     }
 
-    // przenoszenie obecnego pliku i tworzenie miniaturki
     if (empty($messages)) {
-        insertGameToDB($photoName, $uploadData['author'], $uploadData['title']);
+
+        // dodawaie do bazy danch
+        $document = [
+            'file_name' => $photoName,
+            'author' => $viewData['author'],
+            'title' => $viewData['title']
+        ];
+        insertToDb('games', $document);
+        
+        // przenoszenie pliku oraz tworzenie miniaturki
         if (move_uploaded_file($photo['tmp_name'], $target)) {
             createThumbnail($target, $thumbTarget);
             $title = $uploadData['title'];
@@ -119,7 +128,6 @@ function displayGames($page){
     $games = fetchGames();
 
     $perPage = 4;
-    
     $pagesAmount = ceil(count($games)/$perPage);
     if($page < 0) $page = 0;
     if($page > $pagesAmount) $page = $pagesAmount;
