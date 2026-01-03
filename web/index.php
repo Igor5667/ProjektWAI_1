@@ -23,7 +23,8 @@ switch ($action) {
         $view = 'register_view.php';
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
-        $result = handleRegister($_FILES['photo'], $_POST);
+        $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
+        $result = handleRegister($photo, $_POST);
 
         showMessage($result['messages'], $result['success']);
 

@@ -16,6 +16,30 @@ function isLoginTaken($login) {
     return count($results) > 0;
 }
 
+function validatePhoto($photo) {
+    $errors = [];
+    if (!$photo || $photo['error'] === UPLOAD_ERR_NO_FILE) {
+        return ["Nie wybrano zdjęcia."];
+    }
+
+    if ($photo['error'] !== UPLOAD_ERR_OK) {
+        return ["Błąd przesyłania zdjęcia."];
+    }
+
+    $ext = pathinfo($photo['name'], PATHINFO_EXTENSION);
+    if (!in_array(strtolower($ext), ['jpg', 'png'])) {
+        $errors = ["Niedozwolony format pliku. (jpg lub png)"];
+    }
+
+    if ($photo['size'] > 1024 * 1024
+    || $photo['error'] == UPLOAD_ERR_INI_SIZE // ten blad jest wtedy gdy size>2MB
+    || $photo['error'] == UPLOAD_ERR_FORM_SIZE) {
+        $errors = ["Plik jest za duży (max 1MB)."];
+    }
+
+    return $errors;
+}
+
 function getDb() {
     try {
         // używam niskopoziomowego Manager ponieważ 
@@ -69,14 +93,14 @@ function createThumbnail($sourcePath, $destPath, $width = 200, $height = 125) {
     return $result;
 }
 
-function showMessage($message, $passed){
-    $message = implode("<br>", $message);
+function showMessage($messages, $passed){
+    $message = implode("<br>", $messages);
 
     $alertClass = $passed ? 'alert-success' : 'alert-danger';
     $icon = $passed ? '✅' : '❌';
     echo "
-        <div class='alert $alertClass position-fixed bottom-0 start-50 translate-middle-x mb-5' role='alert'>
-            $icon &nbsp; $message
+        <div class='alert $alertClass position-fixed bottom-0 start-50 translate-middle-x mb-5 w-100 d-flex align-items-center gap-3' style='max-width: 400px;'role='alert'>
+            <span>$icon</span>$message
         </div>";
 }
 
@@ -88,28 +112,12 @@ function handleUpload($photo, $postData) {
 
     // sprawdzanie czy autor albo tytul zostali dodani
     if($postData['author'] == '' || $postData['title'] == ''){
-        $messages[] = "Nie podano autora bądz tytułu";
+        $messages[] = "Nie podano autora bądz tytułu.";
     }
 
-    if(!$photo){
-        $messages[] = "Nie wybrano zdjęcia";
-        return ['success' => false, 'messages' => $messages];
-    }
-
-    // sprawdzanie typu zdjecia
-    if (!preg_match('/\.(jpg|png)$/i', $photoName)) {
-        $messages[] = "Wybrano nieodpowiedni typ zdjęcia.";
-    }
-
-    // sprawdzanie rozmiaru zdjecia <1MB
-    if ($photo['size'] > 1024 * 1024 
-    || $photo['error'] == UPLOAD_ERR_INI_SIZE // ten blad jest wtedy gdy size>2MB
-    || $photo['error'] == UPLOAD_ERR_FORM_SIZE) {
-        $messages[] = "Plik jest za duży (max 1MB).";
-    }
+    $messages = array_merge($messages, validatePhoto($photo));
 
     if (empty($messages)) {
-
         // dodawaie do bazy danch
         $document = [
             'file_name' => $photoName,
@@ -138,45 +146,36 @@ function handleRegister($photo, $postData) {
     $pass = $postData['password'];
     $passConfirm = $postData['password-confirmation'];
 
-    // 1. Walidacja E-maila
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $messages[] = "Podano niepoprawny adres e-mail.";
+    // sprawdzanie czy wszystkie pola są uzupełnione
+    if($email == '' || $login == '' || $pass == '' || $passConfirm == ''){
+        $messages[] = "Nie uzupełniono wszystkich pól.";
     }
 
-    // 2. Walidacja Loginu (czy nie jest zajęty)
     if (isLoginTaken($login)) {
         $messages[] = "Ten login jest już zajęty.";
     }
 
-    // 3. Walidacja Haseł
     if ($pass !== $passConfirm) {
         $messages[] = "Hasła nie są identyczne.";
     }
     
-    $allowedExtensions = ['jpg', 'png'];
-    $ext = pathinfo($photo['name'], PATHINFO_EXTENSION);
-    
-    if ($photo['error'] !== UPLOAD_ERR_OK) {
-        $messages[] = "Błąd przesyłania zdjęcia.";
-    } elseif (!in_array(strtolower($ext), $allowedExtensions)) {
-        $messages[] = "Wybrano nieodpowiedni typ zdjęcia.";
-    }
+    $messages = array_merge($messages, validatePhoto($photo));
 
-    // Jeśli są błędy, przerywamy i je zwracamy
+    // Jeżeli są błędy to przerwanie
     if (!empty($messages)) {
         return ['success' => false, 'messages' => $messages];
     }
 
-    $hash = password_hash($pass, PASSWORD_DEFAULT);
-
     $targetPath = 'images/profilePhotos/' . $login;
     
-    // Tworzymy miniaturkę (nadpisujemy nią oryginał, zgodnie z wytycznymi oszczędzamy miejsce)
+    // Tworzymy miniaturkę 
     if (createThumbnail($photo['tmp_name'], $targetPath, 150, 150)) {
+        // dodawanie do bazy danych
+        $hash = password_hash($pass, PASSWORD_DEFAULT);
         $document = [
             'email' => $email,
             'login' => $login,
-            'password' => $hash, // Zapisujemy skrót, a nie jawne hasło!
+            'password' => $hash,
             'profile_picture' => $targetPath
         ];
         insertToDb('users', $document);
@@ -184,7 +183,7 @@ function handleRegister($photo, $postData) {
         return ['success' => true, 'messages' => ["Konto zostało utworzone!"]];
         
     } else {
-        return ['success' => false, 'messages' => ["Błąd podczas zapisu zdjęcia na serwerze."]];
+        return ['success' => false, 'messages' => ["Błąd po stronie serwera. Prosimy spróbować ponownie później."]];
     }
 }
 
