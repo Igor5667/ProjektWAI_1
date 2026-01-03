@@ -35,7 +35,7 @@ switch ($action) {
 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
-        $gamesData = displayGames($page);
+        $gamesData = getDataForLibrary($page);
         $viewData['gamesToDisplay'] = $gamesData['gamesToDisplay'];
         $viewData['pagesAmount'] = $gamesData['pagesAmount'];
         
