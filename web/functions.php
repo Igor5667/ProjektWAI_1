@@ -8,12 +8,12 @@ function fetchData($collection){
     return $results;
 }
 
-function isLoginTaken($login) {
+function getUserByLogin($login) {
     $manager = getDb();
     $query = new MongoDB\Driver\Query(['login' => $login]);
     $cursor = $manager->executeQuery('wai.users', $query);
     $results = $cursor->toArray();
-    return count($results) > 0;
+    return $results[0] ?? null;
 }
 
 function validatePhoto($photo) {
@@ -38,6 +38,15 @@ function validatePhoto($photo) {
     }
 
     return $errors;
+}
+
+function checkRequiredFields($data, $fieldsToCheck){
+    foreach ($fieldsToCheck as $field) {
+        if (!isset($data[$field]) || trim($data[$field]) === '') {
+            return false;
+        }
+    }
+    return true;
 }
 
 function getDb() {
@@ -110,9 +119,10 @@ function handleUpload($photo, $postData) {
     $target = 'images/' . $photoName;
     $thumbTarget = 'images/thumbnails/' . pathinfo($photoName, PATHINFO_FILENAME) . '.jpg';
 
-    // sprawdzanie czy autor albo tytul zostali dodani
-    if($postData['author'] == '' || $postData['title'] == ''){
-        $messages[] = "Nie podano autora bądz tytułu.";
+    // sprawdzanie czy wszystkie pola są uzupełnione
+    $requiredFields = ['title', 'author']
+    if(checkRequiredFields($postData, $requiredFields)){
+        $messages[] = "Nie uzupełniono wszystkich pól.";
     }
 
     $messages = array_merge($messages, validatePhoto($photo));
@@ -141,21 +151,20 @@ function handleUpload($photo, $postData) {
 
 function handleRegister($photo, $postData) {
     $messages = [];
-    $email = $postData['email'];
     $login = $postData['login'];
-    $pass = $postData['password'];
-    $passConfirm = $postData['password-confirmation'];
+    $password = $postData['password'];
 
     // sprawdzanie czy wszystkie pola są uzupełnione
-    if($email == '' || $login == '' || $pass == '' || $passConfirm == ''){
+    $requiredFields = ['email', 'login', 'password', 'password-confirmation']
+    if(checkRequiredFields($postData, $requiredFields)){
         $messages[] = "Nie uzupełniono wszystkich pól.";
     }
 
-    if (isLoginTaken($login)) {
+    if (getUserByLogin($login)) {
         $messages[] = "Ten login jest już zajęty.";
     }
 
-    if ($pass !== $passConfirm) {
+    if ($password !== $postData['password-confirmation']) {
         $messages[] = "Hasła nie są identyczne.";
     }
     
@@ -166,21 +175,22 @@ function handleRegister($photo, $postData) {
         return ['success' => false, 'messages' => $messages];
     }
 
-    $targetPath = 'images/profilePhotos/' . $login;
+    $uniqueName = $login . '_' . time() . '.jpg';
+    $targetPath = 'images/profilePhotos/' . $uniqueName;
     
     // Tworzymy miniaturkę 
     if (createThumbnail($photo['tmp_name'], $targetPath, 150, 150)) {
         // dodawanie do bazy danych
-        $hash = password_hash($pass, PASSWORD_DEFAULT);
+        $hash = password_hash($password, PASSWORD_DEFAULT);
         $document = [
-            'email' => $email,
+            'email' => $postData['email'],
             'login' => $login,
             'password' => $hash,
             'profile_picture' => $targetPath
         ];
         insertToDb('users', $document);
 
-        return ['success' => true, 'messages' => ["Konto zostało utworzone!"]];
+        return ['success' => true, 'messages' => ["Konto <b>$login</b> zostało utworzone!"]];
         
     } else {
         return ['success' => false, 'messages' => ["Błąd po stronie serwera. Prosimy spróbować ponownie później."]];
