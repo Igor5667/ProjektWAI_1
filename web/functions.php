@@ -120,8 +120,8 @@ function handleUpload($photo, $postData) {
     $thumbTarget = 'images/thumbnails/' . pathinfo($photoName, PATHINFO_FILENAME) . '.jpg';
 
     // sprawdzanie czy wszystkie pola są uzupełnione
-    $requiredFields = ['title', 'author']
-    if(checkRequiredFields($postData, $requiredFields)){
+    $requiredFields = ['title', 'author'];
+    if(!checkRequiredFields($postData, $requiredFields)){
         $messages[] = "Nie uzupełniono wszystkich pól.";
     }
 
@@ -155,8 +155,8 @@ function handleRegister($photo, $postData) {
     $password = $postData['password'];
 
     // sprawdzanie czy wszystkie pola są uzupełnione
-    $requiredFields = ['email', 'login', 'password', 'password-confirmation']
-    if(checkRequiredFields($postData, $requiredFields)){
+    $requiredFields = ['email', 'login', 'password', 'password-confirmation'];
+    if(!checkRequiredFields($postData, $requiredFields)){
         $messages[] = "Nie uzupełniono wszystkich pól.";
     }
 
