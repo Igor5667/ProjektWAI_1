@@ -217,6 +217,27 @@ function handleRegister($photo, $postData) {
     }
 }
 
-function handleLogin(){
+function handleLogin($postData){
+    // sprawdzanie czy są wszystkie pola wypełnione
+    if(!checkRequiredFields($postData, ['login', 'password'])){
+        return ['success' => false, 'messages' => ["Nie uzupełniono wszystkich pól."]];
+    }
 
+    $user = getUserByLogin($postData['login']);
+
+    // sprawdzanie czy jest taki uzytkownik
+    if(!$user){
+        return ['success' => false, 'messages' => ["Nie ma takiego użytkownika."]];
+    }
+
+    if(password_verify($postData['password'], $user->password)) {
+        session_regenerate_id(); 
+        
+        $_SESSION['user_id'] = (string)$user->_id;
+        $_SESSION['user_login'] = $user->login;
+
+        return ['success' => true, 'messages' => ["Zalogowano pomyślnie."]];
+    }
+
+    return ['success' => false, 'messages' => ["Błąd po stronie serwera. Prosimy spróbować ponownie później."]];
 }

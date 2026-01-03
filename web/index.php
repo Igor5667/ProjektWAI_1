@@ -1,4 +1,5 @@
 <?php 
+session_start();
 require_once './functions.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'library';
@@ -18,6 +19,18 @@ switch ($action) {
         break;
     case 'login':
         $view = 'login_view.php';
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
+
+        $result = handleLogin($_POST);
+        
+        if ($result['success']) {
+            echo "<h1>Witaj " . htmlspecialchars($_SESSION['user_login']) . "!</h1>";
+            echo "<p>Jesteś zalogowany. (ID sesji: " . session_id() . ")</p>";
+            exit; 
+        } else {
+            showMessage($result['messages'], false);
+        }
+        
         break;
     case 'register':
         $view = 'register_view.php';
