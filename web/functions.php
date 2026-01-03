@@ -1,16 +1,10 @@
 <?php
 
-function fetchGames(){
+function fetchData($collection){
     $manager = getDb();
     $query = new MongoDB\Driver\Query([], []); // wybieram wszystkie dokumenty
-    $cursor = $manager->executeQuery('wai.games', $query);
+    $cursor = $manager->executeQuery("wai.$collection", $query);
     $results = $cursor->toArray();
-
-    // thumbnaile są tylko jpg
-    foreach($results as $result){
-        $result->thnumbnail_name = pathinfo($result->file_name, PATHINFO_FILENAME) . '.jpg';
-    }
-
     return $results;
 }
 
@@ -78,7 +72,7 @@ function showMessage($message, $passed){
         </div>";
 }
 
-function handleUpload($photo, $uploadData) {
+function handleUpload($photo, $postData) {
     $messages = [];
     $photoName = basename($photo['name']);
     $target = 'images/' . $photoName;
@@ -97,7 +91,7 @@ function handleUpload($photo, $uploadData) {
     }
 
     // sprawdzanie czy autor albo tytul zostali dodani
-    if($uploadData['author'] == '' || $uploadData['title'] == ''){
+    if($postData['author'] == '' || $postData['title'] == ''){
         $messages[] = "Nie podano autora bądz tytułu";
     }
 
@@ -106,15 +100,15 @@ function handleUpload($photo, $uploadData) {
         // dodawaie do bazy danch
         $document = [
             'file_name' => $photoName,
-            'author' => $viewData['author'],
-            'title' => $viewData['title']
+            'author' => $postData['author'],
+            'title' => $postData['title']
         ];
         insertToDb('games', $document);
         
         // przenoszenie pliku oraz tworzenie miniaturki
         if (move_uploaded_file($photo['tmp_name'], $target)) {
             createThumbnail($target, $thumbTarget);
-            $title = $uploadData['title'];
+            $title = $postData['title'];
             return ['success' => true, 'msg' => "Udało się dodać grę <b>$title</b>"];
         } else {
             $messages[] = "Błąd serwera przy zapisie.";
@@ -124,8 +118,38 @@ function handleUpload($photo, $uploadData) {
     return ['success' => false, 'messages' => $messages];
 }
 
+function handleRegister($photo, $postData){
+    $messages = [];
+
+    $targetPath = 'images/profilePhotos/' . $photo['name'];
+    createThumbnail($photo['tmp_name'], $targetPath, 150, 150);
+
+    // sprawdzanie czy hasła są takie same
+    if($postData['password'] != $postData['password-confirmation']){
+        $messages[] = "Hasła nie są takie same";
+    }
+
+    if (empty($messages)) {
+        $document = [
+                'email' => $postData['email'],
+                'login' => $postData['login'],
+                'password' => $postData['password'],
+                'profile_picture' => $targetPath
+            ];
+        insertToDb('users', $document);
+        return ['success' => true, 'messages' => ["Konto utworzone!"]];
+    }
+
+    return ['success' => false, 'messages' => $messages];
+}
+
 function displayGames($page){
-    $games = fetchGames();
+    $games = fetchData('games');
+
+    // thumbnaile są tylko jpg
+    foreach($games as $game){
+        $game->thnumbnail_name = pathinfo($game->file_name, PATHINFO_FILENAME) . '.jpg';
+    }
 
     $perPage = 4;
     $pagesAmount = ceil(count($games)/$perPage);

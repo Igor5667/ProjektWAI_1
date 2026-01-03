@@ -11,6 +11,7 @@
     style="background-color: white; max-width: 400px;"
     >
     <div class="d-flex flex-column gap-3">
+        <input type="text" name="email" id="email" placeholder="E-mail" class="form-control">
         <input type="text" name="login" id="login" placeholder="Login" class="form-control">
         <input type="text" name="password" id="password" placeholder="Hasło" class="form-control">
         <input type="text" name="password-confirmation" id="password-confirmation" placeholder="Powtórz hasło" class="form-control">
@@ -21,6 +22,6 @@
             <input type="file" name="photo" id="fileInput" class="form-control">
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Zaloguj</button>
-    <div>Nie masz konta? <a href="index.php?action=register">Zarejestruj się</a></div>
+    <button type="submit" class="btn btn-primary">Zarejestruj się</button>
+    <div>Masz już konto? <a href="index.php?action=login">Zaloguj się</a></div>
 </form>

@@ -32,14 +32,15 @@ switch ($action) {
         break;
     case 'login':
         $view = 'login_view.php';
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
-
-        
-
         break;
     case 'register':
         $view = 'register_view.php';
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
+
+        $result = handleRegister($_FILES['photo'], $_POST);
+
+        showMessage($result['messages'], $result['success']);
+
         break;
     case 'library':
     default:
