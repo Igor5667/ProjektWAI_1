@@ -1,0 +1,26 @@
+<a href="index.php" class="position-fixed top-0 end-0 m-2">
+    <button class="btn btn-primary">Wróć</button>
+</a>
+
+<h1 class="text-center mt-5">Zarejestruj się</h1>
+
+<form 
+    method="post" 
+    enctype="multipart/form-data" 
+    class="container d-flex flex-column gap-3 mt-5" 
+    style="background-color: white; max-width: 400px;"
+    >
+    <div class="d-flex flex-column gap-3">
+        <input type="text" name="login" id="login" placeholder="Login" class="form-control">
+        <input type="text" name="password" id="password" placeholder="Hasło" class="form-control">
+        <input type="text" name="password-confirmation" id="password-confirmation" placeholder="Powtórz hasło" class="form-control">
+        <div class="d-flex flex-column">
+            <label for="fileInput" class="text-start" style="color: #000000c1; font-size: 12px">
+                Dodaj zdjęcie profilowe:
+            </label>
+            <input type="file" name="photo" id="fileInput" class="form-control">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Zaloguj</button>
+    <div>Nie masz konta? <a href="index.php?action=register">Zarejestruj się</a></div>
+</form>

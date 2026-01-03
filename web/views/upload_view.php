@@ -5,7 +5,12 @@
 <h1 class="text-center mt-5">Dodaj grę do biblioteki</h1>
 <p class="text-center">wypełnij poniższy formularz i prześlij</p>
 
-<form method="post" enctype="multipart/form-data" class="container d-flex flex-column gap-3 mt-5" style="background-color: white">
+<form 
+    method="post" 
+    enctype="multipart/form-data" 
+    class="container d-flex flex-column gap-3 mt-5" 
+    style="background-color: white; max-width: 600px;"
+    >
     <div class="d-flex flex-column gap-3">
         <input type="text" name="author" id="author" placeholder="Autor" class="form-control">
         <input type="text" name="title" id="title" placeholder="Tytuł" class="form-control">

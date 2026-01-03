@@ -1,6 +1,11 @@
-<a href="index.php?action=upload" class="position-fixed top-0 end-0 m-2 z-3">
-    <button class="btn btn-primary">Dodaj zdjęcie</button>
-</a>
+<div class="d-flex justify-content-end gap-2 p-2 position-fixed w-100 top-0 z-3">
+    <a href="index.php?action=upload">
+        <button class="btn btn-primary rounded-pill px-3 ">Dodaj zdjęcie</button>
+    </a>
+    <a href="index.php?action=login">
+        <button class="btn btn-primary rounded-pill px-3 ">Zaloguj się</button>
+    </a>    
+</div>
 
 <h1 class="text-center mt-5">Biblioteka gier</h1>
 <p class="text-center">poniżej znajdują się moje gry</p>

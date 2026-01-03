@@ -30,6 +30,17 @@ switch ($action) {
         $viewData['passed'] = $passed;
         
         break;
+    case 'login':
+        $view = 'login_view.php';
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
+
+        
+
+        break;
+    case 'register':
+        $view = 'register_view.php';
+        break;
     case 'library':
     default:
         $view = 'library_view.php';
