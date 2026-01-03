@@ -86,6 +86,16 @@ function handleUpload($photo, $postData) {
     $target = 'images/' . $photoName;
     $thumbTarget = 'images/thumbnails/' . pathinfo($photoName, PATHINFO_FILENAME) . '.jpg';
 
+    // sprawdzanie czy autor albo tytul zostali dodani
+    if($postData['author'] == '' || $postData['title'] == ''){
+        $messages[] = "Nie podano autora bądz tytułu";
+    }
+
+    if(!$photo){
+        $messages[] = "Nie wybrano zdjęcia";
+        return ['success' => false, 'messages' => $messages];
+    }
+
     // sprawdzanie typu zdjecia
     if (!preg_match('/\.(jpg|png)$/i', $photoName)) {
         $messages[] = "Wybrano nieodpowiedni typ zdjęcia.";
@@ -96,11 +106,6 @@ function handleUpload($photo, $postData) {
     || $photo['error'] == UPLOAD_ERR_INI_SIZE // ten blad jest wtedy gdy size>2MB
     || $photo['error'] == UPLOAD_ERR_FORM_SIZE) {
         $messages[] = "Plik jest za duży (max 1MB).";
-    }
-
-    // sprawdzanie czy autor albo tytul zostali dodani
-    if($postData['author'] == '' || $postData['title'] == ''){
-        $messages[] = "Nie podano autora bądz tytułu";
     }
 
     if (empty($messages)) {
@@ -117,7 +122,7 @@ function handleUpload($photo, $postData) {
         if (move_uploaded_file($photo['tmp_name'], $target)) {
             createThumbnail($target, $thumbTarget);
             $title = $postData['title'];
-            return ['success' => true, 'msg' => "Udało się dodać grę <b>$title</b>"];
+            return ['success' => true, 'messages' => ["Udało się dodać grę <b>$title</b>"]];
         } else {
             $messages[] = "Błąd serwera przy zapisie.";
         }
@@ -154,7 +159,7 @@ function handleRegister($photo, $postData) {
     if ($photo['error'] !== UPLOAD_ERR_OK) {
         $messages[] = "Błąd przesyłania zdjęcia.";
     } elseif (!in_array(strtolower($ext), $allowedExtensions)) {
-        $messages[] = "Tylko pliki JPG i PNG są dozwolone.";
+        $messages[] = "Wybrano nieodpowiedni typ zdjęcia.";
     }
 
     // Jeśli są błędy, przerywamy i je zwracamy

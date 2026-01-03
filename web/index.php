@@ -7,27 +7,13 @@ $viewData = [];
 
 switch ($action) {
     case 'upload':
-        $messages = [];
-        $passed = false;
         $view = 'upload_view.php';
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
-        if (!isset($_FILES['photo']) || $_FILES['photo']['error'] === UPLOAD_ERR_NO_FILE) {
-            $messages[] = "Nie wybrano zdjęcia";
-        } else {
-            $result = handleUpload($_FILES['photo'], $_POST);
+        $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
+        $result = handleUpload($photo, $_POST);
             
-            if ($result['success']) {
-                $passed = true;
-                $messages[] = $result['msg'];
-            } else {
-                $messages = array_merge($messages, $result['messages']);
-            }
-        }
-        showMessage($messages, $passed);
-
-        $viewData['messages'] = $messages;
-        $viewData['passed'] = $passed;
+        showMessage($result['messages'], $result['success']);
         
         break;
     case 'login':
