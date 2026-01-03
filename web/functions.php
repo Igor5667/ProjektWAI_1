@@ -8,6 +8,14 @@ function fetchData($collection){
     return $results;
 }
 
+function isLoginTaken($login) {
+    $manager = getDb();
+    $query = new MongoDB\Driver\Query(['login' => $login]);
+    $cursor = $manager->executeQuery('wai.users', $query);
+    $results = $cursor->toArray();
+    return count($results) > 0;
+}
+
 function getDb() {
     try {
         // używam niskopoziomowego Manager ponieważ 
@@ -118,29 +126,61 @@ function handleUpload($photo, $postData) {
     return ['success' => false, 'messages' => $messages];
 }
 
-function handleRegister($photo, $postData){
+function handleRegister($photo, $postData) {
     $messages = [];
+    $email = $postData['email'];
+    $login = $postData['login'];
+    $pass = $postData['password'];
+    $passConfirm = $postData['password-confirmation'];
 
-    $targetPath = 'images/profilePhotos/' . $photo['name'];
-    createThumbnail($photo['tmp_name'], $targetPath, 150, 150);
-
-    // sprawdzanie czy hasła są takie same
-    if($postData['password'] != $postData['password-confirmation']){
-        $messages[] = "Hasła nie są takie same";
+    // 1. Walidacja E-maila
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $messages[] = "Podano niepoprawny adres e-mail.";
     }
 
-    if (empty($messages)) {
+    // 2. Walidacja Loginu (czy nie jest zajęty)
+    if (isLoginTaken($login)) {
+        $messages[] = "Ten login jest już zajęty.";
+    }
+
+    // 3. Walidacja Haseł
+    if ($pass !== $passConfirm) {
+        $messages[] = "Hasła nie są identyczne.";
+    }
+    
+    $allowedExtensions = ['jpg', 'png'];
+    $ext = pathinfo($photo['name'], PATHINFO_EXTENSION);
+    
+    if ($photo['error'] !== UPLOAD_ERR_OK) {
+        $messages[] = "Błąd przesyłania zdjęcia.";
+    } elseif (!in_array(strtolower($ext), $allowedExtensions)) {
+        $messages[] = "Tylko pliki JPG i PNG są dozwolone.";
+    }
+
+    // Jeśli są błędy, przerywamy i je zwracamy
+    if (!empty($messages)) {
+        return ['success' => false, 'messages' => $messages];
+    }
+
+    $hash = password_hash($pass, PASSWORD_DEFAULT);
+
+    $targetPath = 'images/profilePhotos/' . $login;
+    
+    // Tworzymy miniaturkę (nadpisujemy nią oryginał, zgodnie z wytycznymi oszczędzamy miejsce)
+    if (createThumbnail($photo['tmp_name'], $targetPath, 150, 150)) {
         $document = [
-                'email' => $postData['email'],
-                'login' => $postData['login'],
-                'password' => $postData['password'],
-                'profile_picture' => $targetPath
-            ];
+            'email' => $email,
+            'login' => $login,
+            'password' => $hash, // Zapisujemy skrót, a nie jawne hasło!
+            'profile_picture' => $targetPath
+        ];
         insertToDb('users', $document);
-        return ['success' => true, 'messages' => ["Konto utworzone!"]];
-    }
 
-    return ['success' => false, 'messages' => $messages];
+        return ['success' => true, 'messages' => ["Konto zostało utworzone!"]];
+        
+    } else {
+        return ['success' => false, 'messages' => ["Błąd podczas zapisu zdjęcia na serwerze."]];
+    }
 }
 
 function displayGames($page){
