@@ -8,7 +8,7 @@
     >
     <div class="d-flex flex-column gap-3">
         <input type="text" name="login" id="login" placeholder="Login" class="form-control">
-        <input type="text" name="password" id="password" placeholder="Hasło" class="form-control">
+        <input type="password" name="password" id="password" placeholder="Hasło" class="form-control">
     </div>
     <button type="submit" class="btn btn-primary">Zaloguj</button>
     <div>Nie masz konta? <a href="front_controller.php?action=register">Zarejestruj się</a></div>

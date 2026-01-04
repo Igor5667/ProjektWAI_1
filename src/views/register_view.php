@@ -9,8 +9,8 @@
     <div class="d-flex flex-column gap-3">
         <input type="text" name="email" id="email" placeholder="E-mail" class="form-control">
         <input type="text" name="login" id="login" placeholder="Login" class="form-control">
-        <input type="text" name="password" id="password" placeholder="Hasło" class="form-control">
-        <input type="text" name="password-confirmation" id="password-confirmation" placeholder="Powtórz hasło" class="form-control">
+        <input type="password" name="password" id="password" placeholder="Hasło" class="form-control">
+        <input type="password" name="password-confirmation" id="password-confirmation" placeholder="Powtórz hasło" class="form-control">
         <div class="d-flex flex-column">
             <label for="fileInput" class="text-start" style="color: #000000c1; font-size: 12px">
                 Dodaj zdjęcie profilowe:

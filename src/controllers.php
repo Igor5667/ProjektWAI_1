@@ -55,9 +55,15 @@ function controller_upload(&$model) {
 function controller_register(&$model) {
     if($_SERVER['REQUEST_METHOD'] !== 'POST') return 'register_view.php';
     $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
-    $messages = [];
+    $email = $_POST['email'];
     $login = $_POST['login'];
     $password = $_POST['password'];
+    $messages = [];
+    
+    // sprawdzanie poprawnosci emaila
+    if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        $messages[] = "Niepoprawny adres e-mail.";
+    }
 
     // sprawdzanie czy wszystkie pola są uzupełnione
     $requiredFields = ['email', 'login', 'password', 'password-confirmation'];
@@ -89,7 +95,7 @@ function controller_register(&$model) {
         // dodawanie do bazy danych
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $document = [
-            'email' => $_POST['email'],
+            'email' => $email,
             'login' => $login,
             'password' => $hash,
             'profile_picture' => $targetPath
