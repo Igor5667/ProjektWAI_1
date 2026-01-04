@@ -14,5 +14,5 @@
 </div>
 
 <?php
-    include "../src/views/partial/pagination.php";
+    include '../views/partial/pagination.php';
 ?>

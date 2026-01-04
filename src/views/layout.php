@@ -10,13 +10,13 @@
 <body>
     <?php 
     // renderowanie navbara
-    include "../src/views/partial/navBar.php";
+    include '../views/partial/navBar.php';
 
     // renderowanie widoku
     include $view; 
     
     // wyświetlanie message jeżeli jest wiadomość
-    require_once "../src/views/partial/message.php";
+    require_once '../views/partial/message.php';
     if(!empty($model['message'])){
         showMessage($model['message']);
     }; 

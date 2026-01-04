@@ -19,6 +19,6 @@ function dispatch($routing, $action){
     $view = $controller($model);
     
     // render widoku
-    include '../src/views/layout.php';
+    include 'views/layout.php';
 }
 ?>
