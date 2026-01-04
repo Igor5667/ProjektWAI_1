@@ -7,6 +7,12 @@ $view = '';
 $viewData = [];
 $viewData['message'] = [];
 
+// jeżeli wiadomosc z ostatniego żądania jest w sesji to zapisuję w viewData
+if (isset($_SESSION['flash_message'])) {
+    $viewData['message'] = $_SESSION['flash_message'];
+    unset($_SESSION['flash_message']);
+}
+
 switch ($action) {
     case 'logout':
         logoutUser();
@@ -32,6 +38,7 @@ switch ($action) {
 
         $result = handleLogin($_POST);
             if($result['success']) {
+                $_SESSION['flash_message'] = $result;
                 header("Location: index.php?action=library");
                 exit;
             } else {
