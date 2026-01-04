@@ -198,9 +198,14 @@ function handleRegister($photo, $postData) {
             'profile_picture' => $targetPath
         ];
         insertToDb('users', $document);
-
-        return ['success' => true, 'messages' => ["Konto<b>$login</b>zostało utworzone!<br>Możesz się zalogować."]];
         
+        // ustawianie sesji żeby zapisać message przed przekierowaniem
+        $_SESSION['flash_message'] = [
+            'success' => true, 
+            'messages' => ["Konto <b>$login</b> zostało utworzone!<br>Możesz się zalogować."]
+        ];
+        header("Location: index.php?action=login");
+        exit;
     } else {
         return ['success' => false, 'messages' => ["Błąd po stronie serwera. Prosimy spróbować ponownie później."]];
     }
@@ -219,14 +224,21 @@ function handleLogin($postData){
         return ['success' => false, 'messages' => ["Nie ma takiego użytkownika."]];
     }
 
+    // sprawdzanie hasła
     if(password_verify($postData['password'], $user->password)) {
         session_regenerate_id(); 
-        
+        // ustawianie parametrów sesji
         $_SESSION['user_id'] = (string)$user->_id;
         $_SESSION['user_login'] = $user->login;
         $_SESSION['user_photo'] = isset($user->profile_picture) ? $user->profile_picture : null;
 
-        return ['success' => true, 'messages' => ["Zalogowano pomyślnie."]];
+        // ustawianie sesji żeby zapisać message przed przekierowaniem
+        $_SESSION['flash_message'] = [
+            'success' => true, 
+            'messages' => ["Zalogowano pomyślnie."]
+        ];
+        header("Location: index.php?action=library");
+        exit;
     }
     else{
         return ['success' => false, 'messages' => ["Niewłaściwe hasło."]];

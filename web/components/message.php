@@ -13,7 +13,9 @@ function showMessage($data){
             style='width:90%;max-width: 400px;'
             id='flash-message'
             role='alert'>
-            <span>$icon</span>$messagesString
+            
+            <span>$icon</span>
+            <span>$messagesString</span>
         </div>";
 }
 ?>
