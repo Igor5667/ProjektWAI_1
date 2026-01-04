@@ -1,7 +1,7 @@
 <?php 
 session_start();
 require_once '../src/business.php';
-require_once './functions.php';
+require_once '../src/controllers.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'library';
 $view = '';
@@ -18,27 +18,20 @@ if (isset($_SESSION['flash_message'])) {
 
 switch ($action) {
     case 'logout':
-        logoutUser();
+        controller_logout();
         break;
     case 'upload':
-        $view = handleUpload($viewData);
+        $view = controller_upload($viewData);
         break;
     case 'login':
-        $view = handleLogin($viewData);
+        $view = controller_login($viewData);
         break;
     case 'register':
-        $view = handleRegister($viewData);
+        $view = controller_register($viewData);
         break;
     case 'library':
     default:
-        $view = 'library_view.php';
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $viewData['page'] = $page;
-
-        $gamesData = getDataForLibrary($page);
-        $viewData['gamesToDisplay'] = $gamesData['gamesToDisplay'];
-        $viewData['pagesAmount'] = $gamesData['pagesAmount'];
-        
+        $view = controller_library($viewData);
         break;
 }
 include 'views/layout.php';

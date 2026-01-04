@@ -102,24 +102,4 @@ function createThumbnail($sourcePath, $destPath, $width = 200, $height = 125) {
     return $result;
 }
 
-function getDataForLibrary($page){
-    $games = fetchData('games');
-
-    // thumbnaile są tylko jpg
-    foreach($games as $game){
-        $game->thnumbnail_name = pathinfo($game->file_name, PATHINFO_FILENAME) . '.jpg';
-    }
-
-    $perPage = 4;
-    $pagesAmount = ceil(count($games)/$perPage);
-    if($page < 0) $page = 0;
-    if($page > $pagesAmount) $page = $pagesAmount;
-    $offset = ($page - 1) * $perPage;
-
-    return [
-        'gamesToDisplay' => array_slice($games, $offset, $perPage),
-        'pagesAmount' => $pagesAmount
-    ];
-}
-
 ?>
