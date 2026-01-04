@@ -5,7 +5,10 @@ require_once './functions.php';
 $action = isset($_GET['action']) ? $_GET['action'] : 'library';
 $view = '';
 $viewData = [];
+$viewData['currentLocation'] = $action; 
 $viewData['message'] = [];
+$viewData['showReturnButton'] = true;
+$viewData['isUserLogged'] = isset($_SESSION['user_id']);
 
 // jeżeli wiadomosc z ostatniego żądania jest w sesji to zapisuję w viewData
 if (isset($_SESSION['flash_message'])) {
@@ -59,6 +62,6 @@ switch ($action) {
         
         break;
 }
-
+extract($viewData);
 include 'views/layout.php';
 ?>

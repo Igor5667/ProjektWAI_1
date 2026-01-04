@@ -1,4 +1,9 @@
-<h1 class="text-center mt-5">Dodaj grę do biblioteki</h1>
+<h1 class="text-center mt-5">
+    Dodaj grę do biblioteki
+    <?php if(!$isUserLogged): ?>
+    jako gość
+    <?php endif; ?>
+</h1>
 <p class="text-center">wypełnij poniższy formularz i prześlij</p>
 
 <form 
@@ -8,7 +13,11 @@
     style="background-color: white; max-width: 600px;"
     >
     <div class="d-flex flex-column gap-3">
-        <input type="text" name="author" id="author" placeholder="Autor" class="form-control">
+        <input type="text" name="author" id="author" placeholder="Autor" class="form-control"
+            <?php if($isUserLogged): ?>
+                value="<?php echo htmlspecialchars($_SESSION['user_login']); ?>" disabled
+            <?php endif; ?>
+        >
         <input type="text" name="title" id="title" placeholder="Tytuł" class="form-control">
         <div class="d-flex flex-column">
             <input type="file" name="photo" id="fileInput" class="form-control">

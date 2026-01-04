@@ -17,8 +17,8 @@
     
     // wyświetlanie message jeżeli jest wiadomość
     require_once "components/message.php";
-    if(!empty($viewData['message'])){
-        showMessage($viewData['message']);
+    if(!empty($message)){
+        showMessage($message);
     }; 
     ?>
     <script src="static/script.js"></script>

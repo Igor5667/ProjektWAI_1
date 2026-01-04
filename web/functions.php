@@ -128,6 +128,14 @@ function handleUpload($photo, $postData) {
     $target = 'images/' . $photoName;
     $thumbTarget = 'images/thumbnails/' . pathinfo($photoName, PATHINFO_FILENAME) . '.jpg';
 
+    // jeżeli użytkownik jest zalogowany to on zawsze jest autorem
+    if (isset($_SESSION['user_id'])) {
+        $author = $_SESSION['user_login'];
+    } else {
+        $author = isset($postData['author']) ? $postData['author'] : null;
+    }
+    $postData['author'] = $author;
+
     // sprawdzanie czy wszystkie pola są uzupełnione
     $requiredFields = ['title', 'author'];
     if(!checkRequiredFields($postData, $requiredFields)){
@@ -148,8 +156,15 @@ function handleUpload($photo, $postData) {
         // przenoszenie pliku oraz tworzenie miniaturki
         if (move_uploaded_file($photo['tmp_name'], $target)) {
             createThumbnail($target, $thumbTarget);
+            
+            // ustawianie sesji żeby zapisać message przed przekierowaniem
             $title = $postData['title'];
-            return ['success' => true, 'messages' => ["Udało się dodać grę <b>$title</b>"]];
+            $_SESSION['flash_message'] = [
+                'success' => true, 
+                'messages' => ["Dodano grę <b>$title</b>."]
+            ];
+            header("Location: index.php");
+            exit;
         } else {
             $messages[] = "Błąd serwera przy zapisie.";
         }
