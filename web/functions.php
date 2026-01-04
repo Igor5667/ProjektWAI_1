@@ -199,7 +199,7 @@ function handleRegister($photo, $postData) {
         ];
         insertToDb('users', $document);
 
-        return ['success' => true, 'messages' => ["Konto <b>$login</b> zostało utworzone!"]];
+        return ['success' => true, 'messages' => ["Konto<b>$login</b>zostało utworzone!<br>Możesz się zalogować."]];
         
     } else {
         return ['success' => false, 'messages' => ["Błąd po stronie serwera. Prosimy spróbować ponownie później."]];

@@ -37,13 +37,13 @@ switch ($action) {
         if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $result = handleLogin($_POST);
-            if($result['success']) {
-                $_SESSION['flash_message'] = $result;
-                header("Location: index.php?action=library");
-                exit;
-            } else {
-                $viewData['message'] = $result;
-            }
+        if($result['success']) {
+            $_SESSION['flash_message'] = $result;
+            header("Location: index.php?action=library");
+            exit;
+        } else {
+            $viewData['message'] = $result;
+        }
         
         break;
     case 'register':
@@ -51,7 +51,14 @@ switch ($action) {
         if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
-        $viewData['message'] = handleRegister($photo, $_POST);
+        $result = handleRegister($photo, $_POST);
+        if($result['success']) {
+            $_SESSION['flash_message'] = $result;
+            header("Location: index.php?action=login");
+            exit;
+        } else {
+            $viewData['message'] = $result;
+        }
 
         break;
     case 'library':
