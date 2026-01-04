@@ -10,15 +10,15 @@
 <body>
     <?php 
     // renderowanie navbara
-    include "components/navBar.php";
+    include "../src/views/partial/navBar.php";
 
     // renderowanie widoku
     include $view; 
     
     // wyświetlanie message jeżeli jest wiadomość
-    require_once "components/message.php";
-    if(!empty($viewData['message'])){
-        showMessage($viewData['message']);
+    require_once "../src/views/partial/message.php";
+    if(!empty($model['message'])){
+        showMessage($model['message']);
     }; 
     ?>
     <script src="static/script.js"></script>

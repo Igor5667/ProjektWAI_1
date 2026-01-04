@@ -1,6 +1,6 @@
 <h1 class="text-center mt-5">
     Dodaj grę do biblioteki
-    <?php if(!$viewData['isUserLogged']): ?>
+    <?php if(!$model['isUserLogged']): ?>
     jako gość
     <?php endif; ?>
 </h1>
@@ -14,7 +14,7 @@
     >
     <div class="d-flex flex-column gap-3">
         <input type="text" name="author" id="author" placeholder="Autor" class="form-control"
-            <?php if($viewData['isUserLogged']): ?>
+            <?php if($model['isUserLogged']): ?>
                 value="<?php echo htmlspecialchars($_SESSION['user_login']); ?>" disabled
             <?php endif; ?>
         >

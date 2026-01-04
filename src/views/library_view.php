@@ -2,7 +2,7 @@
 <p class="text-center">poniżej znajdują się moje gry</p>
 
 <div class="d-flex flex-wrap gap-4 mt-4 p-2 justify-content-center">
-    <?php foreach($viewData['gamesToDisplay'] as $game): ?>
+    <?php foreach($model['gamesToDisplay'] as $game): ?>
         <div class="card">
             <img class="card-img-top" src="<?= 'images/thumbnails/' . $game->thnumbnail_name; ?>" alt="<?= $game->title; ?>">
             <div class="card-body">
@@ -14,5 +14,5 @@
 </div>
 
 <?php
-    include "components/pagination.php";
+    include "../src/views/partial/pagination.php";
 ?>

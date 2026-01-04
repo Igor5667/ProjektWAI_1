@@ -5,20 +5,20 @@ function dispatch($routing, $action){
     $controller = $routing[$action] ?? $routing['library'];
 
     // ustawianie danych wejsciowych
-    $viewData = [];
-    $viewData['currentLocation'] = $action; 
-    $viewData['message'] = [];
-    $viewData['isUserLogged'] = isset($_SESSION['user_id']);
+    $model = [];
+    $model['currentLocation'] = $action; 
+    $model['message'] = [];
+    $model['isUserLogged'] = isset($_SESSION['user_id']);
 
-    // jeżeli wiadomosc z ostatniego żądania jest w sesji to zapisuję w viewData
+    // jeżeli wiadomosc z ostatniego żądania jest w sesji to zapisuję w model
     if (isset($_SESSION['flash_message'])) {
-        $viewData['message'] = $_SESSION['flash_message'];
+        $model['message'] = $_SESSION['flash_message'];
         unset($_SESSION['flash_message']);
     }
 
-    $view = $controller($viewData);
+    $view = $controller($model);
     
     // render widoku
-    include 'views/layout.php';
+    include '../src/views/layout.php';
 }
 ?>

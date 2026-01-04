@@ -3,7 +3,7 @@
     
     <?php 
     // 1. Przycisk WRÓĆ
-    if($viewData['currentLocation'] != 'library'): 
+    if($model['currentLocation'] != 'library'): 
         renderButton("Wróć", "front_controller.php");
     endif; 
     ?>
@@ -16,8 +16,8 @@
     ?>
 
     <?php 
-    if (!$viewData['isUserLogged']):
-        if($viewData['currentLocation'] == 'login'){
+    if (!$model['isUserLogged']):
+        if($model['currentLocation'] == 'login'){
             renderButton("Zarejestruj się", "front_controller.php?action=register", "primary");
         }
         else{
