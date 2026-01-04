@@ -1,7 +1,3 @@
-<a href="index.php" class="position-fixed top-0 end-0 m-2">
-    <button class="btn btn-primary">Wróć</button>
-</a>
-
 <h1 class="text-center mt-5">Zarejestruj się</h1>
 
 <form 

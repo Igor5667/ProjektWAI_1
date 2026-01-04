@@ -7,9 +7,13 @@ $view = '';
 $viewData = [];
 
 switch ($action) {
+    case 'logout':
+        logoutUser();
+        header("Location: index.php?action=login");
+        exit;
     case 'upload':
         $view = 'upload_view.php';
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
+        if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
         $result = handleUpload($photo, $_POST);
@@ -18,23 +22,28 @@ switch ($action) {
         
         break;
     case 'login':
+        // jeżeli zalogowany to przekierowuje do library
+        if(isset($_SESSION['user_id'])) {
+            header("Location: index.php?action=library");
+            exit;
+        };
+
         $view = 'login_view.php';
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
+        if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $result = handleLogin($_POST);
-        
-        if ($result['success']) {
-            echo "<h1>Witaj " . htmlspecialchars($_SESSION['user_login']) . "!</h1>";
-            echo "<p>Jesteś zalogowany. (ID sesji: " . session_id() . ")</p>";
-            exit; 
-        } else {
-            showMessage($result['messages'], false);
+        if($result['success']) {
+            header("Location: index.php?action=library");
+            exit;
         }
+        else {
+            showMessage($result['messages'], $result['success']);
+        };
         
         break;
     case 'register':
         $view = 'register_view.php';
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') break;
+        if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
         $result = handleRegister($photo, $_POST);
@@ -51,6 +60,7 @@ switch ($action) {
         $gamesData = getDataForLibrary($page);
         $viewData['gamesToDisplay'] = $gamesData['gamesToDisplay'];
         $viewData['pagesAmount'] = $gamesData['pagesAmount'];
+        $viewData['showReturnButton'] = false;
         
         break;
 }

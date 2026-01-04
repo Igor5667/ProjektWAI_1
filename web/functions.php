@@ -235,9 +235,26 @@ function handleLogin($postData){
         
         $_SESSION['user_id'] = (string)$user->_id;
         $_SESSION['user_login'] = $user->login;
+        $_SESSION['user_photo'] = isset($user->profile_picture) ? $user->profile_picture : null;
 
         return ['success' => true, 'messages' => ["Zalogowano pomyślnie."]];
     }
-
+    else{
+        return ['success' => false, 'messages' => ["Niewłaściwe hasło."]];
+    }
     return ['success' => false, 'messages' => ["Błąd po stronie serwera. Prosimy spróbować ponownie później."]];
+}
+
+function logoutUser() {
+    $_SESSION = [];
+
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+
+    session_destroy();
 }

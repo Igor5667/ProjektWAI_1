@@ -8,6 +8,7 @@
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <?php include "components/navBar.php"; ?>
     <?php include $view; ?>
 </body>
 </html>
