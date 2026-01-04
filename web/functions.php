@@ -28,13 +28,13 @@ function validatePhoto($photo) {
 
     $ext = pathinfo($photo['name'], PATHINFO_EXTENSION);
     if (!in_array(strtolower($ext), ['jpg', 'png'])) {
-        $errors = ["Niedozwolony format pliku. (jpg lub png)"];
+        $errors[] = "Niedozwolony format pliku. (jpg lub png)";
     }
 
     if ($photo['size'] > 1024 * 1024
     || $photo['error'] == UPLOAD_ERR_INI_SIZE // ten blad jest wtedy gdy size>2MB
     || $photo['error'] == UPLOAD_ERR_FORM_SIZE) {
-        $errors = ["Plik jest za duży (max 1MB)."];
+        $errors[] = "Plik jest za duży (max 1MB).";
     }
 
     return $errors;
