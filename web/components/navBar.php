@@ -3,7 +3,7 @@
     
     <?php 
     // 1. Przycisk WRÓĆ
-    if($currentLocation != 'library'): 
+    if($viewData['currentLocation'] != 'library'): 
         renderButton("Wróć", "index.php");
     endif; 
     ?>
@@ -16,8 +16,8 @@
     ?>
 
     <?php 
-    if (!$isUserLogged):
-        if($currentLocation == 'login'){
+    if (!$viewData['isUserLogged']):
+        if($viewData['currentLocation'] == 'login'){
             renderButton("Zarejestruj się", "index.php?action=register", "primary");
         }
         else{
