@@ -25,7 +25,7 @@
         }
     else: ?>
 
-        <div class="d-flex align-items-center border rounded-pill ps-1 pe-3 py-1 bg-light border border-primary">
+        <div class="d-flex align-items-center border rounded-pill ps-1 pe-3 py-1 border border-primary">
             <?php if(!empty($_SESSION['user_photo'])): ?>
                 <img src="<?= htmlspecialchars($_SESSION['user_photo']) ?>" 
                      alt="Avatar" 

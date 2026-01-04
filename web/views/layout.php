@@ -8,7 +8,19 @@
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <?php include "components/navBar.php"; ?>
-    <?php include $view; ?>
+    <?php 
+    // renderowanie navbara
+    include "components/navBar.php";
+
+    // renderowanie widoku
+    include $view; 
+    
+    // wyświetlanie message jeżeli jest wiadomość
+    require_once "components/message.php";
+    if(!empty($viewData['message'])){
+        showMessage($viewData['message']);
+    }; 
+    ?>
+    <script src="static/script.js"></script>
 </body>
 </html>

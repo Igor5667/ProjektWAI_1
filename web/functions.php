@@ -102,17 +102,6 @@ function createThumbnail($sourcePath, $destPath, $width = 200, $height = 125) {
     return $result;
 }
 
-function showMessage($messages, $passed){
-    $message = implode("<br>", $messages);
-
-    $alertClass = $passed ? 'alert-success' : 'alert-danger';
-    $icon = $passed ? '✅' : '❌';
-    echo "
-        <div class='alert $alertClass position-fixed bottom-0 start-50 translate-middle-x mb-5 w-100 d-flex align-items-center gap-3' style='max-width: 400px;'role='alert'>
-            <span>$icon</span>$message
-        </div>";
-}
-
 function getDataForLibrary($page){
     $games = fetchData('games');
 

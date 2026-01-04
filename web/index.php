@@ -5,6 +5,7 @@ require_once './functions.php';
 $action = isset($_GET['action']) ? $_GET['action'] : 'library';
 $view = '';
 $viewData = [];
+$viewData['message'] = [];
 
 switch ($action) {
     case 'logout':
@@ -16,9 +17,7 @@ switch ($action) {
         if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
-        $result = handleUpload($photo, $_POST);
-            
-        showMessage($result['messages'], $result['success']);
+        $viewData['message'] = handleUpload($photo, $_POST);
         
         break;
     case 'login':
@@ -32,13 +31,12 @@ switch ($action) {
         if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $result = handleLogin($_POST);
-        if($result['success']) {
-            header("Location: index.php?action=library");
-            exit;
-        }
-        else {
-            showMessage($result['messages'], $result['success']);
-        };
+            if($result['success']) {
+                header("Location: index.php?action=library");
+                exit;
+            } else {
+                $viewData['message'] = $result;
+            }
         
         break;
     case 'register':
@@ -46,15 +44,12 @@ switch ($action) {
         if($_SERVER['REQUEST_METHOD'] !== 'POST') break;
 
         $photo = !isset($_FILES['photo']) ? null : $_FILES['photo'];
-        $result = handleRegister($photo, $_POST);
-
-        showMessage($result['messages'], $result['success']);
+        $viewData['message'] = handleRegister($photo, $_POST);
 
         break;
     case 'library':
     default:
         $view = 'library_view.php';
-
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
         $gamesData = getDataForLibrary($page);
