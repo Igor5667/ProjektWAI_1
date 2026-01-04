@@ -19,5 +19,5 @@
         </div>
     </div>
     <button type="submit" class="btn btn-primary">Zarejestruj się</button>
-    <div>Masz już konto? <a href="index.php?action=login">Zaloguj się</a></div>
+    <div>Masz już konto? <a href="front_controller.php?action=login">Zaloguj się</a></div>
 </form>

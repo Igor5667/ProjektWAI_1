@@ -42,7 +42,7 @@ function controller_upload(&$model) {
                 'success' => true, 
                 'messages' => ["Dodano grę <b>$title</b>."]
             ];
-            header("Location: index.php");
+            header("Location: front_controller.php");
             exit;
         } else {
             $messages[] = "Błąd serwera przy zapisie.";
@@ -101,7 +101,7 @@ function controller_register(&$model) {
             'success' => true, 
             'messages' => ["Konto <b>$login</b> zostało utworzone!<br>Możesz się zalogować."]
         ];
-        header("Location: index.php?action=login");
+        header("Location: front_controller.php?action=login");
         exit;
     } else {
         $model['message'] =  ['success' => false, 'messages' => ["Błąd po stronie serwera. Prosimy spróbować ponownie później."]];
@@ -112,7 +112,7 @@ function controller_register(&$model) {
 function controller_login(&$model){
     // powrot gdy jest zalogowany
     if(isset($_SESSION['user_id'])) {
-        header("Location: index.php?action=library");
+        header("Location: front_controller.php?action=library");
         exit;
     };
 
@@ -146,7 +146,7 @@ function controller_login(&$model){
             'success' => true, 
             'messages' => ["Zalogowano pomyślnie."]
         ];
-        header("Location: index.php?action=library");
+        header("Location: front_controller.php?action=library");
         exit;
     }
     else{
@@ -169,7 +169,7 @@ function controller_logout() {
     }
 
     session_destroy();
-    header("Location: index.php?action=login");
+    header("Location: front_controller.php?action=login");
     exit;
 }
 

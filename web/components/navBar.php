@@ -4,7 +4,7 @@
     <?php 
     // 1. Przycisk WRÓĆ
     if($viewData['currentLocation'] != 'library'): 
-        renderButton("Wróć", "index.php");
+        renderButton("Wróć", "front_controller.php");
     endif; 
     ?>
 
@@ -12,16 +12,16 @@
     <div class="flex-grow-1"></div>
 
     <?php 
-    renderButton("Dodaj grę", "index.php?action=upload");
+    renderButton("Dodaj grę", "front_controller.php?action=upload");
     ?>
 
     <?php 
     if (!$viewData['isUserLogged']):
         if($viewData['currentLocation'] == 'login'){
-            renderButton("Zarejestruj się", "index.php?action=register", "primary");
+            renderButton("Zarejestruj się", "front_controller.php?action=register", "primary");
         }
         else{
-            renderButton("Zaloguj się", "index.php?action=login", "primary");
+            renderButton("Zaloguj się", "front_controller.php?action=login", "primary");
         }
     else: ?>
 
@@ -40,7 +40,7 @@
         </div>
 
         <?php 
-        renderButton("Wyloguj", "index.php?action=logout", "outline-danger");
+        renderButton("Wyloguj", "front_controller.php?action=logout", "outline-danger");
         ?>
     <?php endif; ?>
 </nav>

@@ -11,5 +11,5 @@
         <input type="text" name="password" id="password" placeholder="Hasło" class="form-control">
     </div>
     <button type="submit" class="btn btn-primary">Zaloguj</button>
-    <div>Nie masz konta? <a href="index.php?action=register">Zarejestruj się</a></div>
+    <div>Nie masz konta? <a href="front_controller.php?action=register">Zarejestruj się</a></div>
 </form>
